@@ -217,7 +217,9 @@ def update_config(m2ee, app_name):
     )
 
     # Configure PostgreSQL input plugin
-    if include_db_metrics() or datadog.is_enabled():
+    if (
+        include_db_metrics() or datadog.is_enabled()
+    ) and util.i_am_primary_instance():
         db_config = database.get_config()
         if db_config and db_config["DatabaseType"] == "PostgreSQL":
             # TODO: check if we need to change the metric name for Datadog compatibility

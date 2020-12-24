@@ -9,7 +9,6 @@ class TestCaseDatadogUtilFunctions:
 
         tags_cases = [
             (["app:testapp", "service:testservice"], "testservice"),
-            (["app:testapp", "service:testservice",], "testservice",),
             (["app:testapp"], "testapp"),
             (["service:testservice"], "testservice"),
             ([], "app"),
