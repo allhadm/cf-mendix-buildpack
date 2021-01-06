@@ -26,6 +26,7 @@ from buildpack import (
     runtime,
     telegraf,
     util,
+    metering,
 )
 
 

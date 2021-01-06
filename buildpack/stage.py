@@ -17,6 +17,7 @@ from buildpack import (
     runtime,
     telegraf,
     util,
+    metering,
 )
 from buildpack.runtime_components import database
 from lib.m2ee.version import MXVersion
@@ -167,6 +168,7 @@ if __name__ == "__main__":
     mx_java_agent.stage(DOT_LOCAL_LOCATION, CACHE_DIR)
     telegraf.stage(DOT_LOCAL_LOCATION, CACHE_DIR)
     datadog.stage(BUILDPACK_DIR, DOT_LOCAL_LOCATION, CACHE_DIR)
+    metering.stage(BUILDPACK_DIR, BUILD_DIR, DOT_LOCAL_LOCATION)
     runtime.stage(BUILDPACK_DIR, BUILD_DIR, CACHE_DIR)
     databroker.stage(DOT_LOCAL_LOCATION, CACHE_DIR)
     nginx.stage(BUILDPACK_DIR, BUILD_DIR, CACHE_DIR)
