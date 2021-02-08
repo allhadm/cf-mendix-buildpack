@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 import subprocess
 
 from buildpack import util
@@ -40,6 +41,16 @@ def _is_usage_metering_enabled():
         return True
 
 
+def _get_project_id(build_path):
+    file_name = os.path.join(build_path, "model", "metadata.json")
+    try:
+        with open(file_name) as file_handle:
+            data = json.loads(file_handle.read())
+            logging.info(data)
+    except IOError:
+        raise Exception("No model/metadata.json or .mpr found in archive")
+
+
 def _set_up_environment():
     e = dict(os.environ.copy())
     if "MXRUNTIME_License.SubscriptionSecret" in os.environ:
@@ -47,9 +58,9 @@ def _set_up_environment():
         e["MXUMS_SUBSCRIPTION_SECRET"] = os.environ[
             "MXRUNTIME_License.SubscriptionSecret"
         ]
-        #os.environ.pop("MXRUNTIME_License.SubscriptionSecret")
-        del os.environ['MXRUNTIME_License.SubscriptionSecret']
-        #os.unsetenv("MXRUNTIME_License.SubscriptionSecret")
+        # os.environ.pop("MXRUNTIME_License.SubscriptionSecret")
+        del os.environ["MXRUNTIME_License.SubscriptionSecret"]
+        # os.unsetenv("MXRUNTIME_License.SubscriptionSecret")
     if "MXRUNTIME_License.LicenseServerURL" in os.environ:
         logging.info(
             "Setting MXUMS_LICENSESERVER_URL to {%s}",
@@ -58,7 +69,7 @@ def _set_up_environment():
         e["MXUMS_LICENSESERVER_URL"] = os.environ[
             "MXRUNTIME_License.LicenseServerURL"
         ]
-        #os.environ.pop("MXRUNTIME_License.LicenseServerURL")
+        # os.environ.pop("MXRUNTIME_License.LicenseServerURL")
         os.unsetenv("MXRUNTIME_License.LicenseServerURL")
     if "MXRUNTIME_License.EnvironmentName" in os.environ:
         logging.info("Setting MXUMS_ENVIRONMENT_NAME")
@@ -92,9 +103,8 @@ def stage(buildpack_path, build_path, cache_dir):
         logging.info("Usage metering is NOT enabled")
 
 
-def run(m2ee):
+def run():
     logging.info("################## running met sidecar ###############")
-    logging.info(m2ee)
     subprocess.Popen(
         SIDECAR_DIR + "/" + SIDECAR_FILENAME, env=_set_up_environment()
     )
