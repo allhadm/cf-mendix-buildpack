@@ -14,7 +14,6 @@ SIDECAR_ARCHIVE = "metering-sidecar-linux-amd64-{}.tar.gz".format(
 )
 SIDECAR_URL_ROOT = "/mx-buildpack/experimental{}".format(NAMESPACE)
 SIDECAR_DIR = os.path.abspath("/home/vcap/app/metering")
-CONFIG_FILE = os.path.join(SIDECAR_DIR, "datadog")
 SIDECAR_FILENAME = "cf-metering-sidecar"
 
 
@@ -120,8 +119,7 @@ def stage(buildpack_path, build_path, cache_dir):
         config = {"ProjectID": project_id}
 
         logging.debug("Writing nginx configuration file...")
-        os.makedirs(SIDECAR_DIR + "/sidecar_conf", exist_ok=True)
-        write_file(SIDECAR_DIR + "/sidecar_conf/conf.json", config)
+        write_file(SIDECAR_DIR + "/conf.json", config)
 
     else:
         logging.info("Usage metering is NOT enabled")
