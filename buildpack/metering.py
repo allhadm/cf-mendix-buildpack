@@ -41,12 +41,13 @@ def _is_usage_metering_enabled():
         return True
 
 
-def _get_project_id(build_path):
+def _set_project_id(build_path):
     file_name = os.path.join(build_path, "model", "metadata.json")
     try:
         with open(file_name) as file_handle:
             data = json.loads(file_handle.read())
-            return data["ProjectID"]
+            if data["ProjectID"]:
+                os.environ["MXUMS_PROJECT_ID"] = data["ProjectID"]
     except IOError:
         raise Exception("No model/metadata.json")
 
@@ -80,9 +81,6 @@ def _set_up_environment():
             dbconfig["DatabaseHost"],
             dbconfig["DatabaseName"],
         )
-    project_id = _get_project_id()
-    if project_id:
-        os.environ["MXUMS_PROJECT_ID"] = project_id
     e = dict(os.environ.copy())
     return e
 
@@ -94,7 +92,7 @@ def stage(buildpack_path, build_path, cache_dir):
         build_path,
         cache_dir,
     )
-    _get_project_id(build_path)
+    _set_project_id(build_path)
     if _is_usage_metering_enabled():
         logging.info("Usage metering is enabled")
         _download(build_path, cache_dir)
