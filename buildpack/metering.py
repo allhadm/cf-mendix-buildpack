@@ -47,7 +47,8 @@ def _set_up_environment():
         e["MXUMS_SUBSCRIPTION_SECRET"] = os.environ[
             "MXRUNTIME_License.SubscriptionSecret"
         ]
-        os.environ.pop("MXRUNTIME_License.SubscriptionSecret")
+        #os.environ.pop("MXRUNTIME_License.SubscriptionSecret")
+        os.unsetenv("MXRUNTIME_License.SubscriptionSecret")
     if "MXRUNTIME_License.LicenseServerURL" in os.environ:
         logging.info(
             "Setting MXUMS_LICENSESERVER_URL to {%s}",
@@ -56,7 +57,8 @@ def _set_up_environment():
         e["MXUMS_LICENSESERVER_URL"] = os.environ[
             "MXRUNTIME_License.LicenseServerURL"
         ]
-        os.environ.pop("MXRUNTIME_License.LicenseServerURL")
+        #os.environ.pop("MXRUNTIME_License.LicenseServerURL")
+        os.unsetenv("MXRUNTIME_License.LicenseServerURL")
     if "MXRUNTIME_License.EnvironmentName" in os.environ:
         logging.info("Setting MXUMS_ENVIRONMENT_NAME")
         e["MXUMS_ENVIRONMENT_NAME"] = os.environ[
@@ -64,6 +66,13 @@ def _set_up_environment():
         ]
         os.environ.pop("MXRUNTIME_License.EnvironmentName")
     dbconfig = database.get_config()
+    if dbconfig:
+        os.environ["DD_SERVICE_MAPPING"] = "postgres://{}:{}@{}/{}".format(
+            dbconfig["DatabaseUserName"],
+            dbconfig["DatabasePassword"],
+            dbconfig["DatabaseHost"],
+            dbconfig["DatabaseName"],
+        )
     logging.info(dbconfig)
     return e
 
@@ -82,8 +91,9 @@ def stage(buildpack_path, build_path, cache_dir):
         logging.info("Usage metering is NOT enabled")
 
 
-def run():
+def run(m2ee):
     logging.info("################## running met sidecar ###############")
+    logging.info(m2ee)
     subprocess.Popen(
         SIDECAR_DIR + "/" + SIDECAR_FILENAME, env=_set_up_environment()
     )
