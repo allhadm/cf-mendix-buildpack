@@ -38,8 +38,8 @@ def _download(build_path, cache_dir):
 
 def _is_usage_metering_enabled():
     if (
-            "MXUMS_LICENSESERVER_URL" in os.environ
-            or "MXRUNTIME_License.LicenseServerURL" in os.environ
+        "MXUMS_LICENSESERVER_URL" in os.environ
+        or "MXRUNTIME_License.LicenseServerURL" in os.environ
     ):
         return True
 
