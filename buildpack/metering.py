@@ -96,6 +96,7 @@ def stage(buildpack_path, build_path, cache_dir):
         build_path,
         cache_dir,
     )
+    _get_project_id(build_path)
     if _is_usage_metering_enabled():
         logging.info("Usage metering is enabled")
         _download(build_path, cache_dir)
