@@ -46,46 +46,44 @@ def _get_project_id(build_path):
     try:
         with open(file_name) as file_handle:
             data = json.loads(file_handle.read())
-            logging.info(data)
+            return data["ProjectID"]
     except IOError:
-        raise Exception("No model/metadata.json or .mpr found in archive")
+        raise Exception("No model/metadata.json")
 
 
 def _set_up_environment():
-    e = dict(os.environ.copy())
     if "MXRUNTIME_License.SubscriptionSecret" in os.environ:
         logging.info("Setting MXUMS_SUBSCRIPTION_SECRET")
-        e["MXUMS_SUBSCRIPTION_SECRET"] = os.environ[
+        os.environ["MXUMS_SUBSCRIPTION_SECRET"] = os.environ[
             "MXRUNTIME_License.SubscriptionSecret"
         ]
-        # os.environ.pop("MXRUNTIME_License.SubscriptionSecret")
-        del os.environ["MXRUNTIME_License.SubscriptionSecret"]
-        # os.unsetenv("MXRUNTIME_License.SubscriptionSecret")
     if "MXRUNTIME_License.LicenseServerURL" in os.environ:
         logging.info(
             "Setting MXUMS_LICENSESERVER_URL to {%s}",
             os.environ["MXRUNTIME_License.LicenseServerURL"],
         )
-        e["MXUMS_LICENSESERVER_URL"] = os.environ[
+        os.environ["MXUMS_LICENSESERVER_URL"] = os.environ[
             "MXRUNTIME_License.LicenseServerURL"
         ]
-        # os.environ.pop("MXRUNTIME_License.LicenseServerURL")
-        os.unsetenv("MXRUNTIME_License.LicenseServerURL")
     if "MXRUNTIME_License.EnvironmentName" in os.environ:
         logging.info("Setting MXUMS_ENVIRONMENT_NAME")
-        e["MXUMS_ENVIRONMENT_NAME"] = os.environ[
+        os.environ["MXUMS_ENVIRONMENT_NAME"] = os.environ[
             "MXRUNTIME_License.EnvironmentName"
         ]
-        os.environ.pop("MXRUNTIME_License.EnvironmentName")
     dbconfig = database.get_config()
     if dbconfig:
-        os.environ["DD_SERVICE_MAPPING"] = "postgres://{}:{}@{}/{}".format(
+        os.environ[
+            "MXUMS_DB_CONNECTION_URL"
+        ] = "postgres://{}:{}@{}/{}".format(
             dbconfig["DatabaseUserName"],
             dbconfig["DatabasePassword"],
             dbconfig["DatabaseHost"],
             dbconfig["DatabaseName"],
         )
-    logging.info(dbconfig)
+    project_id = _get_project_id()
+    if project_id:
+        os.environ["MXUMS_PROJECT_ID"] = project_id
+    e = dict(os.environ.copy())
     return e
 
 
