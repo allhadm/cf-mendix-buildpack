@@ -48,7 +48,8 @@ def _set_up_environment():
             "MXRUNTIME_License.SubscriptionSecret"
         ]
         #os.environ.pop("MXRUNTIME_License.SubscriptionSecret")
-        os.unsetenv("MXRUNTIME_License.SubscriptionSecret")
+        del os.environ['MXRUNTIME_License.SubscriptionSecret']
+        #os.unsetenv("MXRUNTIME_License.SubscriptionSecret")
     if "MXRUNTIME_License.LicenseServerURL" in os.environ:
         logging.info(
             "Setting MXUMS_LICENSESERVER_URL to {%s}",
