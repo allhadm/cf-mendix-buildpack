@@ -2,6 +2,7 @@ import logging
 import os
 import json
 import subprocess
+import sys
 
 from buildpack import util
 from buildpack.runtime_components import database
@@ -14,6 +15,8 @@ SIDECAR_ARCHIVE = "metering-sidecar-linux-amd64-{}.tar.gz".format(
 SIDECAR_URL_ROOT = "/mx-buildpack/experimental{}".format(NAMESPACE)
 SIDECAR_DIR = os.path.abspath("/home/vcap/app/metering")
 SIDECAR_FILENAME = "cf-metering-sidecar"
+# TODO:think about this a bit
+BUILD_PATH = sys.argv[1]
 
 
 def _download(build_path, cache_dir):
@@ -35,8 +38,8 @@ def _download(build_path, cache_dir):
 
 def _is_usage_metering_enabled():
     if (
-        "MXUMS_LICENSESERVER_URL" in os.environ
-        or "MXRUNTIME_License.LicenseServerURL" in os.environ
+            "MXUMS_LICENSESERVER_URL" in os.environ
+            or "MXRUNTIME_License.LicenseServerURL" in os.environ
     ):
         return True
 
@@ -81,6 +84,7 @@ def _set_up_environment():
             dbconfig["DatabaseHost"],
             dbconfig["DatabaseName"],
         )
+    _set_project_id(BUILD_PATH)
     e = dict(os.environ.copy())
     return e
 
@@ -92,7 +96,6 @@ def stage(buildpack_path, build_path, cache_dir):
         build_path,
         cache_dir,
     )
-    _set_project_id(build_path)
     if _is_usage_metering_enabled():
         logging.info("Usage metering is enabled")
         _download(build_path, cache_dir)
