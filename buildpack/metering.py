@@ -2,7 +2,7 @@ import logging
 import os
 import json
 import subprocess
-import sys
+
 
 from buildpack import util
 from buildpack.runtime_components import database
@@ -14,9 +14,8 @@ SIDECAR_ARCHIVE = "metering-sidecar-linux-amd64-{}.tar.gz".format(
 )
 SIDECAR_URL_ROOT = "/mx-buildpack/experimental{}".format(NAMESPACE)
 SIDECAR_DIR = os.path.abspath("/home/vcap/app/metering")
+CONFIG_FILE = os.path.join(SIDECAR_DIR, "datadog")
 SIDECAR_FILENAME = "cf-metering-sidecar"
-# TODO:think about this a bit
-BUILD_PATH = sys.argv[1]
 
 
 def _download(build_path, cache_dir):
@@ -44,15 +43,28 @@ def _is_usage_metering_enabled():
         return True
 
 
-def _set_project_id(build_path):
-    file_name = os.path.join(build_path, "model", "metadata.json")
+def _get_project_id(file_path):
     try:
-        with open(file_name) as file_handle:
+        with open(file_path) as file_handle:
             data = json.loads(file_handle.read())
-            if data["ProjectID"]:
-                os.environ["MXUMS_PROJECT_ID"] = data["ProjectID"]
+            return data["ProjectID"]
     except IOError:
         raise Exception("No model/metadata.json")
+
+
+def write_file(output_file_path, content):
+    if output_file_path is None:
+        print(content)
+    else:
+        try:
+            with open(output_file_path, "w") as f:
+                f.write(str(content))
+        except Exception as exception:
+            raise Exception(
+                "Error while trying to write the configuration to a file. Reason: '{}'".format(
+                    exception
+                )
+            )
 
 
 def _set_up_environment():
@@ -84,7 +96,8 @@ def _set_up_environment():
             dbconfig["DatabaseHost"],
             dbconfig["DatabaseName"],
         )
-    _set_project_id(BUILD_PATH)
+    project_id = _get_project_id(SIDECAR_DIR + "/sidecar_conf/conf.json")
+    os.environ["MXUMS_PROJECT_ID"] = project_id
     e = dict(os.environ.copy())
     return e
 
@@ -99,6 +112,17 @@ def stage(buildpack_path, build_path, cache_dir):
     if _is_usage_metering_enabled():
         logging.info("Usage metering is enabled")
         _download(build_path, cache_dir)
+
+        project_id = _get_project_id(
+            os.path.join(build_path, "model", "metadata.json")
+        )
+
+        config = {"ProjectID": project_id}
+
+        logging.debug("Writing nginx configuration file...")
+        os.makedirs(SIDECAR_DIR + "/sidecar_conf", exist_ok=True)
+        write_file(SIDECAR_DIR + "/sidecar_conf/conf.json", config)
+
     else:
         logging.info("Usage metering is NOT enabled")
 
