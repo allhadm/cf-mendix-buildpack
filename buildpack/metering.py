@@ -117,9 +117,10 @@ def stage(buildpack_path, build_path, cache_dir):
         )
 
         config = {"ProjectID": project_id}
+        logging.info(config)
 
-        logging.debug("Writing nginx configuration file...")
-        write_file(SIDECAR_DIR + "/conf.json", config)
+        # logging.debug("Writing nginx configuration file...")
+        # write_file(SIDECAR_DIR + "/conf.json", config)
 
     else:
         logging.info("Usage metering is NOT enabled")
