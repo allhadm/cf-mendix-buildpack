@@ -57,7 +57,7 @@ def write_file(output_file_path, content):
     else:
         try:
             with open(output_file_path, "w") as f:
-                f.write(str(content))
+                json.dump(content, f)
         except Exception as exception:
             raise Exception(
                 "Error while trying to write the configuration to a file. Reason: '{}'".format(
