@@ -95,8 +95,8 @@ def _set_up_environment():
             dbconfig["DatabaseHost"],
             dbconfig["DatabaseName"],
         )
-    # project_id = _get_project_id(SIDECAR_DIR + "/conf.json")
-    # os.environ["MXUMS_PROJECT_ID"] = project_id
+    project_id = _get_project_id(SIDECAR_DIR + "/conf.json")
+    os.environ["MXUMS_PROJECT_ID"] = project_id
     e = dict(os.environ.copy())
     return e
 
