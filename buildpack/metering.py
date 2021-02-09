@@ -128,6 +128,7 @@ def stage(buildpack_path, build_path, cache_dir):
 
 def run():
     logging.info("################## running met sidecar ###############")
-    subprocess.Popen(
-        SIDECAR_DIR + "/" + SIDECAR_FILENAME, env=_set_up_environment()
-    )
+    if _is_usage_metering_enabled():
+        subprocess.Popen(
+            SIDECAR_DIR + "/" + SIDECAR_FILENAME, env=_set_up_environment()
+        )
