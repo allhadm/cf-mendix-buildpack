@@ -14,7 +14,7 @@ SIDECAR_ARCHIVE = "metering-sidecar-linux-amd64-{}.tar.gz".format(
 )
 SIDECAR_URL_ROOT = "/mx-buildpack/experimental{}".format(NAMESPACE)
 SIDECAR_DIR = os.path.abspath("/home/vcap/app/metering")
-SIDECAR_FILENAME = "cf-metering-sidecar"
+SIDECAR_FILENAME = "metering-sidecar"
 
 
 def _download(build_path, cache_dir):
